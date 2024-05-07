@@ -57,8 +57,19 @@ public class AnswerService {
         this.answerRepository.save(answer);
     }
 
-    public Page<Answer> getAnswerPage(Question question, int page) {
-        Pageable pageable = PageRequest.of(page,10);
-        return this.answerRepository.findAllByQuestion(question, pageable);
+    public Page<Answer> getAnswerPage(Question question, int page, String sort) {
+        if (sort.equals("createDate")) {
+            List<Sort.Order> sorts = new ArrayList<>();
+            sorts.add(Sort.Order.desc("createDate"));
+            Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+            return this.answerRepository.findAllByQuestion(question, pageable);
+        }
+        else {
+            Pageable pageable = PageRequest.of(page, 10);
+            if(sort.equals("voter"))
+                return answerRepository.findAllByQuestionOrderByVoter(question, pageable);
+
+            return answerRepository.findAllByQuestion(question, pageable);
+        }
     }
 }
